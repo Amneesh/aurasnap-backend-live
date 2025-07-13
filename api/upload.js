@@ -57,6 +57,11 @@ export default async function handler(req, res) {
       return res.status(500).json({ error: 'Form parsing failed' });
     }
 
+    const bucketName = fields.bucket || req.query.bucket;
+  if (!bucketName || typeof bucketName !== 'string') {
+    return res.status(400).json({ error: 'Bucket name is required' });
+  }
+
     let file = files.file;
     if (!file) return res.status(400).json({ error: 'No file uploaded' });
     if (Array.isArray(file)) file = file[0];
@@ -73,7 +78,7 @@ export default async function handler(req, res) {
       const upload = new Upload({
         client: s3Client,
         params: {
-          Bucket: process.env.R2_BUCKET_NAME,
+          Bucket: bucketName,
           Key: key,
           Body: webpBuffer, // upload compressed image buffer
           ContentType: 'image/webp',
