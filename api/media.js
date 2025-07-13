@@ -54,7 +54,7 @@ export default async function handler(req, res) {
     const files = (response.Contents || []).map((file) => ({
       key: file.Key,
       title: file.Key.split('/').pop(),
-      signedUrl: `/api/image?key=${encodeURIComponent(file.Key)}`,
+      signedUrl: `/api/image?bucket=${encodeURIComponent(bucket)}&key=${encodeURIComponent(file.Key)}`,
     }));
 
     res.status(200).json(files);
