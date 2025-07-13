@@ -37,10 +37,14 @@ export default async function handler(req, res) {
   }
 
   if (req.method !== 'GET') return res.status(405).end();
+  const bucket = req.query.bucket;
 
+  if (!bucket || typeof bucket !== 'string') {
+    return res.status(400).json({ error: 'Bucket name is required as a query parameter' });
+  }
   try {
     const command = new ListObjectsV2Command({
-      Bucket: process.env.R2_BUCKET_NAME,
+      Bucket: bucket,
       Prefix: 'images/',
       MaxKeys: 1000,
     });

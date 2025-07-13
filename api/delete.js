@@ -38,6 +38,11 @@ export default async function handler(req, res) {
   if (req.method !== 'DELETE') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
+  const bucket = req.query.bucket;
+
+  if (!bucket || typeof bucket !== 'string') {
+    return res.status(400).json({ error: 'Bucket name is required as a query parameter' });
+  }
 
   const { key } = req.query;
 
@@ -47,7 +52,7 @@ export default async function handler(req, res) {
 
   try {
     const command = new DeleteObjectCommand({
-      Bucket: process.env.R2_BUCKET_NAME,
+      Bucket: bucket,
       Key: key,
     });
 

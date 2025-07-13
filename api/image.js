@@ -38,13 +38,17 @@ export default async function handler(req, res) {
   }
 
   if (req.method !== 'GET') return res.status(405).end();
+  const bucket = req.query.bucket;
 
+  if (!bucket || typeof bucket !== 'string') {
+    return res.status(400).json({ error: 'Bucket name is required as a query parameter' });
+  }
   const { key } = req.query;
   if (!key) return res.status(400).json({ error: 'Missing key param' });
 
   try {
     const command = new GetObjectCommand({
-      Bucket: process.env.R2_BUCKET_NAME,
+      Bucket: bucket,
       Key: key,
     });
 
