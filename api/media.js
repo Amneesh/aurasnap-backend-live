@@ -4,13 +4,11 @@ import Cors from 'cors';
 
 dotenv.config();
 
-// Initialize CORS middleware
 const cors = Cors({
   origin: '*',
   methods: ['GET', 'OPTIONS'],
 });
 
-// Helper to run middleware in Vercel
 function runMiddleware(req, res, fn) {
   return new Promise((resolve, reject) => {
     fn(req, res, (result) => {
@@ -32,20 +30,22 @@ const s3Client = new S3Client({
 export default async function handler(req, res) {
   await runMiddleware(req, res, cors);
 
-  if (req.method === 'OPTIONS') {
-    return res.status(200).end();
-  }
-
+  if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'GET') return res.status(405).end();
+
   const bucket = req.query.bucket;
+  let prefix = req.query.prefix || '';  // prefix param (like 'images' or 'videos')
 
   if (!bucket || typeof bucket !== 'string') {
     return res.status(400).json({ error: 'Bucket name is required as a query parameter' });
   }
+
+  if (prefix && !prefix.endsWith('/')) prefix += '/';
+
   try {
     const command = new ListObjectsV2Command({
       Bucket: bucket,
-      Prefix: 'images/',
+      Prefix: prefix,
       MaxKeys: 1000,
     });
 
